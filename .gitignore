@@ -1,0 +1,5 @@
+.env
+home_state/
+litellm_data/
+logs/
+*.db

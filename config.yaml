@@ -1,0 +1,57 @@
+model_list:
+  - model_name: "claude-opus-4-7*"
+    litellm_params:
+      model: "anthropic/claude-opus-4-7"
+      api_key: "os.environ/CLAUDE_PRO_TOKEN"
+      drop_params: true
+
+  - model_name: "claude-sonnet-4-6*"
+    litellm_params:
+      model: "anthropic/claude-sonnet-4-6"
+      api_key: "os.environ/CLAUDE_PRO_TOKEN"
+      drop_params: true
+
+  - model_name: "claude-haiku-4-5*"
+    litellm_params:
+      model: "anthropic/claude-haiku-4-5"
+      api_key: "os.environ/CLAUDE_PRO_TOKEN"
+      drop_params: true
+
+  # ── Remote 1 (wildcard: any model forwarded to remote) ──
+  - model_name: "remote-1/*"
+    litellm_params:
+      model: "anthropic/*"
+      api_key: "os.environ/REMOTE_1_KEY"
+      api_base: "os.environ/REMOTE_1_BASE"
+      drop_params: true
+
+  # ── Remote 2 ──
+  - model_name: "remote-2/*"
+    litellm_params:
+      model: "anthropic/*"
+      api_key: "os.environ/REMOTE_2_KEY"
+      api_base: "os.environ/REMOTE_2_BASE"
+      drop_params: true
+
+litellm_settings:
+  drop_params: true
+  additional_drop_params:
+    - reasoning_effort
+    - context_management
+    - agent_mode
+  log_file: "/app/logs/litellm.log"
+
+router_settings:
+  routing_strategy: "simple-shuffle"
+  num_retries: 2
+  retry_after: 5
+  fallbacks:
+    - claude-opus-4-7*: ["remote-1/claude-opus-4-7", "remote-2/claude-opus-4-7"]
+    - claude-sonnet-4-6*: ["remote-1/claude-sonnet-4-6", "remote-2/claude-sonnet-4-6"]
+    - claude-haiku-4-5*: ["remote-1/claude-haiku-4-5", "remote-2/claude-haiku-4-5"]
+
+general_settings:
+  master_key: "os.environ/LITELLM_MASTER_KEY"
+  host: 0.0.0.0
+  port: 4000
+  allow_requests_on_db_unavailable: true
